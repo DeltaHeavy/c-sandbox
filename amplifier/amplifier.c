@@ -15,7 +15,10 @@
  *
  * It can have any side effects
  * It will be terminated by alarm at some timeout set by the parent
+ * 
  * It is only expected to write retSize bytes to file descriptor fd
+ * so you can run it on any normal function as long as you
+ * write(fout, &foo, retSize) somewhere in there
  *
  * The idea is you write a function (e.g. test, below)
  * which follows the above specification,
@@ -28,8 +31,7 @@
  * timeout is the timeout in seconds for each process,
  * argc and argv can be used to pass through arguments,
  * numProcs which tells the harness how many children to spawn
- *
- * and sink, which takes a pointer to the heap memory allocated by harness
+ * and sink (e.g. print or sum below), which takes a pointer to the heap memory allocated by harness
  * intended to do any cleanup or resolution of the data
  * sink is responsible for freeing the memory, although this can be left for the caller
  *
@@ -76,7 +78,7 @@ void test(unsigned int id, int argc, char **argv, int fd) {
    write(fd, &buf, sizeof(int));
 }
 
-void sink(char **buf, size_t retSize, unsigned int numProcs) {
+void print(char **buf, size_t retSize, unsigned int numProcs) {
    int i;
    for (i = 0; i < numProcs; i++)
       printf("%d\n", (*buf)[i*retSize]);
@@ -110,6 +112,7 @@ void harness(void *func, size_t retSize, unsigned int timeout, int argc, char **
          close(*fds);
          alarm(timeout);
          ((void (*)(unsigned int,int,char**,int))func)(i,argc,argv,fds[1]);
+         alarm(0);
          read(*fds, buf + (i*retSize), retSize);
          close(fds[1]);
          exit(0);
@@ -138,8 +141,8 @@ void harness(void *func, size_t retSize, unsigned int timeout, int argc, char **
 
 #ifdef DEBUG
 int main(int argc, char **argv) {
-   printf("Example 1, all return id:\n");
-   harness(test, sizeof(int), 10, argc, argv, 8, sink);
+   printf("Example 1, all return id, sink = print:\n");
+   harness(test, sizeof(int), 10, argc, argv, 8, print);
    printf("\nExample 2, all return id, sink = sum:\n");
    harness(test, sizeof(int), 10, argc, argv, 8, sum);
 
