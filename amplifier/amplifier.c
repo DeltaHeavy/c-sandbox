@@ -6,18 +6,12 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-/* A parallelizable function matches the following specifications
- * Arguments
- * int id (used as an indentifier)
- * int argc (used as argument count)
- * char **argv (argument vector)
- * int fd (fd to write output to)
- *
- * It can have any side effects
- * It will be terminated by alarm at some timeout set by the parent
- * 
- * It is only expected to write retSize bytes to file descriptor fd
- * so you can run it on any normal function as long as you
+#include "amplifier.h"
+
+/*
+ * A parralelized function is only expected to write retSize
+ * bytes to file descriptor fd so you can run it on any normal
+ * function as long as you
  * write(fout, &foo, retSize) somewhere in there
  *
  * The idea is you write a function (e.g. test, below)
@@ -27,15 +21,6 @@
  *
  * e.g. harness(test, sizeof(int), 1, 0, NULL, 8, sink);
  *
- * where func is the function name, retSize is the size in bytes of the output,
- * timeout is the timeout in seconds for each process,
- * argc and argv can be used to pass through arguments,
- * numProcs which tells the harness how many children to spawn
- * and sink (e.g. print or sum below), which takes a pointer to the heap memory allocated by harness
- * intended to do any cleanup or resolution of the data
- * sink is responsible for freeing the memory, although this can be left for the caller
- *
- * Given all these conditions,
  * harness will automagically run numProcs processes,
  * all running the function func with optional copies of argc+argv
  * gather up their output, and handle it nicely via its sink
