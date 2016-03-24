@@ -33,8 +33,8 @@
  *
  */
 
-#ifndef AMP_H
-#define AMP_H
+#ifndef __AMP_H
+#define __AMP_H
 
 void harness(void *func, size_t retSize, unsigned int timeout, int argc, char** argv, unsigned int numProcs, void *sink);
 
