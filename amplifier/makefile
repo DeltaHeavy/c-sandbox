@@ -1,7 +1,7 @@
 CC=gcc
 OPTS=-Wall -Werror --std=c11
 BUILDOPTS=-O3
-DEBUGOPTS=-DDEBUG -g
+DEBUGOPTS=-DDEV -g
 
 make:
 	$(CC) $(OPTS) $(DEBUGOPTS) amplifier.c -o Amplifier.o

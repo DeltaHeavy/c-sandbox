@@ -45,7 +45,7 @@
  *
  */
 
-#ifdef DEBUG
+#ifdef DEV
 void test(unsigned int id, int argc, char **argv, int fd) {
    int buf = id;
 
@@ -78,6 +78,10 @@ void test(unsigned int id, int argc, char **argv, int fd) {
    write(fd, &buf, sizeof(int));
 }
 
+void email(unsigned int id, int argc, char **argv, int fd) {
+   execlp("echo", "echo", "mailx", NULL);
+}
+
 void print(char **buf, size_t retSize, unsigned int numProcs) {
    int i;
    for (i = 0; i < numProcs; i++)
@@ -100,10 +104,20 @@ void sum(char **buf, size_t retSize, unsigned int numProcs) {
 
 void harness(void *func, size_t retSize, unsigned int timeout, int argc, char **argv, unsigned int numProcs, void *sink) {
    unsigned int i;
-   char *buf = calloc(retSize, numProcs);
-   int *retTable = calloc(sizeof(int), numProcs);
-   pid_t *pidTable = calloc(sizeof(pid_t), numProcs);
+   char *buf;
+   int *retTable; 
+   pid_t *pidTable;
    int fds[2];
+
+   if (retSize && numProcs)
+      buf = calloc(retSize, numProcs);
+
+   if (numProcs) {
+      retTable = calloc(sizeof(int), numProcs);
+      pidTable = calloc(sizeof(pid_t), numProcs);
+   }
+   else
+      return;
 
    pipe(fds);
 
@@ -113,7 +127,8 @@ void harness(void *func, size_t retSize, unsigned int timeout, int argc, char **
          alarm(timeout);
          ((void (*)(unsigned int,int,char**,int))func)(i,argc,argv,fds[1]);
          alarm(0);
-         read(*fds, buf + (i*retSize), retSize);
+         if (retSize)
+            read(*fds, buf + (i*retSize), retSize);
          close(fds[1]);
          exit(0);
       }
@@ -122,7 +137,7 @@ void harness(void *func, size_t retSize, unsigned int timeout, int argc, char **
    close(fds[1]);
    
    for (i = 0; i < numProcs; i++) {
-      if (read(*fds, buf + (i*retSize), retSize) == -1)
+      if (retSize && read(*fds, buf + (i*retSize), retSize) == -1)
          perror(strerror(errno));
    }
 
@@ -136,15 +151,18 @@ void harness(void *func, size_t retSize, unsigned int timeout, int argc, char **
       if (WIFEXITED(retTable[i]) && WEXITSTATUS(retTable[i]) != 0)
          printf("Process %d failed\n", pidTable[i]);
    }
-   ((void (*)(char**,size_t,unsigned int))sink)(&buf, retSize, numProcs);
+   if (sink)
+      ((void (*)(char**,size_t,unsigned int))sink)(&buf, retSize, numProcs);
 }
 
-#ifdef DEBUG
+#ifdef DEV
 int main(int argc, char **argv) {
    printf("Example 1, all return id, sink = print:\n");
    harness(test, sizeof(int), 10, argc, argv, 8, print);
    printf("\nExample 2, all return id, sink = sum:\n");
    harness(test, sizeof(int), 10, argc, argv, 8, sum);
+   printf("\nExample 3, none return (all procs exec), sink = NULL:\n");
+   harness(email, 0, 10, 0, NULL, 8, NULL);
 
    return 0;
 }
