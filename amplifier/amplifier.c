@@ -94,18 +94,19 @@ void sum(char **buf, size_t retSize, unsigned int numProcs) {
 void harness(void *func, size_t retSize, unsigned int timeout, int argc, char **argv, unsigned int numProcs, void *sink) {
    unsigned int i;
    char *buf;
-   int *retTable; 
+   int *retTable = NULL; 
    pid_t *pidTable;
    int fds[2];
 
-   if (numProcs)
+   if (numProcs) {
+      retTable = calloc(sizeof(int), numProcs);
       pidTable = calloc(sizeof(pid_t), numProcs);
+   }
    else
       return;
 
    if (retSize && numProcs) {
       buf = calloc(retSize, numProcs);
-      retTable = calloc(sizeof(int), numProcs);
    }
 
    pipe(fds);
@@ -125,21 +126,20 @@ void harness(void *func, size_t retSize, unsigned int timeout, int argc, char **
 
    close(fds[1]);
    
-   for (i = 0; i < numProcs; i++) {
-      if (retSize && read(*fds, buf + (i*retSize), retSize) == -1)
-         perror(strerror(errno));
-   }
+   if (retSize)
+      for (i = 0; i < numProcs; i++)
+         if (read(*fds, buf + (i*retSize), retSize) == -1)
+            perror(strerror(errno));
 
    close(*fds);
 
-   for (i = 0; i < numProcs; i++) {
+   for (i = 0; i < numProcs; i++)
       pidTable[i] = wait(retTable + i);  
-   }
 
-   for (i = 0; i < numProcs; i++) {
+   for (i = 0; i < numProcs; i++)
       if (WIFEXITED(retTable[i]) && WEXITSTATUS(retTable[i]) != 0)
          printf("Process %d failed\n", pidTable[i]);
-   }
+
    if (sink)
       ((void (*)(char**,size_t,unsigned int))sink)(&buf, retSize, numProcs);
 }
