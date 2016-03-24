@@ -9,10 +9,13 @@
 #include "amplifier.h"
 
 /*
- * A parralelized function is only expected to write retSize
- * bytes to file descriptor fd so you can run it on any normal
+ * A parallelized function is only expected to write retSize
+ * bytes to file descriptor fd
+ *
+ * so you can run it on any normal
  * function as long as you
  * write(fout, &foo, retSize) somewhere in there
+ * if it returns, harness will throw the return value on the ground
  *
  * The idea is you write a function (e.g. test, below)
  * which follows the above specification,
@@ -64,16 +67,17 @@ void test(unsigned int id, int argc, char **argv, int fd) {
 }
 
 void email(unsigned int id, int argc, char **argv, int fd) {
-   execlp("echo", "echo", "mailx", NULL);
+   execlp("echo", "echo", "exec mailx", NULL);
 }
 
-void print(char **buf, size_t retSize, unsigned int numProcs) {
+int print(char **buf, size_t retSize, unsigned int numProcs) {
    int i;
    for (i = 0; i < numProcs; i++)
       printf("%d\n", (*buf)[i*retSize]);
    
    free(*buf);
    *buf = NULL;
+   return 0;
 }
 
 void sum(char **buf, size_t retSize, unsigned int numProcs) {
@@ -94,15 +98,15 @@ void harness(void *func, size_t retSize, unsigned int timeout, int argc, char **
    pid_t *pidTable;
    int fds[2];
 
-   if (retSize && numProcs)
-      buf = calloc(retSize, numProcs);
-
-   if (numProcs) {
-      retTable = calloc(sizeof(int), numProcs);
+   if (numProcs)
       pidTable = calloc(sizeof(pid_t), numProcs);
-   }
    else
       return;
+
+   if (retSize && numProcs) {
+      buf = calloc(retSize, numProcs);
+      retTable = calloc(sizeof(int), numProcs);
+   }
 
    pipe(fds);
 

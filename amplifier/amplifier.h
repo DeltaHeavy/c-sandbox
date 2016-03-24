@@ -32,4 +32,10 @@
  *    unsigned int numProcs (number of children spawned)
  *
  */
+
+#ifndef AMP_H
+#define AMP_H
+
 void harness(void *func, size_t retSize, unsigned int timeout, int argc, char** argv, unsigned int numProcs, void *sink);
+
+#endif
