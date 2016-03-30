@@ -70,6 +70,7 @@ void email(unsigned int id, int argc, char **argv, int fd) {
    execlp("echo", "echo", "exec mailx", NULL);
 }
 
+/* Returns int just as an example that it can */
 int print(char **buf, size_t retSize, unsigned int numProcs) {
    int i;
    for (i = 0; i < numProcs; i++)
