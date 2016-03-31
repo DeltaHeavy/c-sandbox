@@ -15,16 +15,16 @@
  * so you can run it on any normal
  * function as long as you
  * write(fout, &foo, retSize) somewhere in there
- * if it returns, harness will throw the return value on the ground
+ * if it returns, ProcHarness will throw the return value on the ground
  *
  * The idea is you write a function (e.g. test, below)
  * which follows the above specification,
- * and a call to harness like
- * harness(func, retSize, timeout, argc, argv, numProcs, sink)
+ * and a call to ProcHarness like
+ * ProcHarness(func, retSize, timeout, argc, argv, numProcs, sink)
  *
- * e.g. harness(test, sizeof(int), 1, 0, NULL, 8, sink);
+ * e.g. ProcHarness(test, sizeof(int), 1, 0, NULL, 8, sink);
  *
- * harness will automagically run numProcs processes,
+ * ProcHarness will automagically run numProcs processes,
  * all running the function func with optional copies of argc+argv
  * gather up their output, and handle it nicely via its sink
  *
@@ -92,7 +92,7 @@ void sum(char **buf, size_t retSize, unsigned int numProcs) {
 }
 #endif
 
-void harness(void *func, size_t retSize, unsigned int timeout, int argc, char **argv, unsigned int numProcs, void *sink) {
+void ProcHarness(void *func, size_t retSize, unsigned int timeout, int argc, char **argv, unsigned int numProcs, void *sink) {
    unsigned int i;
    char *buf;
    int *retTable = NULL; 
@@ -148,11 +148,11 @@ void harness(void *func, size_t retSize, unsigned int timeout, int argc, char **
 #ifdef DEV
 int main(int argc, char **argv) {
    printf("Example 1, all return id, sink = print:\n");
-   harness(test, sizeof(int), 10, argc, argv, 8, print);
+   ProcHarness(test, sizeof(int), 10, argc, argv, 8, print);
    printf("\nExample 2, all return id, sink = sum:\n");
-   harness(test, sizeof(int), 10, argc, argv, 8, sum);
+   ProcHarness(test, sizeof(int), 10, argc, argv, 8, sum);
    printf("\nExample 3, none return (all procs exec), sink = NULL:\n");
-   harness(email, 0, 10, 0, NULL, 8, NULL);
+   ProcHarness(email, 0, 10, 0, NULL, 8, NULL);
 
    return 0;
 }
