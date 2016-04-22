@@ -12,8 +12,7 @@ void usage() {
    printf("Usage: vigs [ -v ] [ -d ] key [ infile [ outfile ] ]");
 }
 
-int mod(int a, int b)
-{
+int mod(int a, int b) {
    int r = a % b;
    return r < 0 ? r + b : r;
 }
