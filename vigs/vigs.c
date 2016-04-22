@@ -6,8 +6,6 @@
 #include <sys/stat.h>
 
 #define OFFSET 'A'
-#define ENCRYPT 0
-#define DECRYPT 1
 #define ALPHABET_SIZE 26
 
 void usage() {
@@ -22,7 +20,7 @@ int mod(int a, int b)
 
 int main(int argc, char **argv) {
 
-   int verbose = 0, mode = ENCRYPT;
+   int verbose = 0, decrypt = 0;
    int infd = 0, outfd = 0;
    int keylen = 0, i = 0;
    unsigned char x, c;
@@ -33,7 +31,7 @@ int main(int argc, char **argv) {
          verbose = 1;
       }
       else if (!strcmp(*argv, "-d")) {
-         mode = DECRYPT;
+         decrypt = 1;
       }
       else if (!key) {
          key = *argv;
@@ -69,7 +67,7 @@ int main(int argc, char **argv) {
 
    if (verbose) {
       printf("V: %d\n", verbose);
-      printf("D: %d\n", mode);
+      printf("D: %d\n", decrypt);
       if (infile)
          printf("I: %s\n", infile);
       if (outfile)
@@ -101,7 +99,7 @@ int main(int argc, char **argv) {
          x = key[i++ % keylen];
          c = toupper(c);
          c -= OFFSET;
-         if (mode)
+         if (decrypt)
             c = mod((c - x), ALPHABET_SIZE);
          else
             c = mod((c + x), ALPHABET_SIZE);
