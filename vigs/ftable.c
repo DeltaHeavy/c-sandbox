@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <math.h>
 
 #define ALPHABET_SIZE 26
 #define OFFSET 'A'
@@ -16,8 +17,9 @@ void usage() {
 
 int main(int argc, char **argv) {
 
-   int i, verbose = 0;
+   int i, j, count = 0, charcount = 0, verbose = 0;
    unsigned int skip = 0, period = 1;
+   double percent;
    int infd = 0, outfd = 0;
    char *infile = NULL, *outfile = NULL;
    int *ftable = calloc(ALPHABET_SIZE, sizeof(int));
@@ -59,13 +61,15 @@ int main(int argc, char **argv) {
       }
    }
 
-   printf("V: %u\n", verbose);
-   printf("S: %u\n", skip);
-   printf("P: %u\n", period);
-   if (infile)
-      printf("I: %s\n", infile);
-   if (outfile)
-      printf("O: %s\n", outfile);
+   if (verbose) {
+      printf("V: %u\n", verbose);
+      printf("S: %u\n", skip);
+      printf("P: %u\n", period);
+      if (infile)
+         printf("I: %s\n", infile);
+      if (outfile)
+         printf("O: %s\n", outfile);
+   }
 
    if (infile) {
       infd = open(infile, O_RDONLY);
@@ -87,15 +91,25 @@ int main(int argc, char **argv) {
       dup2(outfd, 1);
    }
 
+   while (skip--)
+      scanf("%c", &c);
+
    while (scanf("%c", &c) != EOF) {
-      if (isalpha(c)) {
+      if (isalpha(c) && !(count++ % period)) {
+         charcount++;
          c = toupper(c);
          ftable[c - OFFSET]++;
       }
    }
 
+   printf("Total chars: %d\n", charcount);
    for (i = 0; i < ALPHABET_SIZE; i++) {
-      printf("%c: %d\n", OFFSET + i, ftable[i]);
+      percent = ((double)ftable[i] / charcount) * 100;
+      printf("%c: %9d ( %5.2f%%) ", OFFSET + i, ftable[i], percent);
+      for (j = 0; j < ceil(percent); j++) {
+         printf("*");
+      }
+      printf("\n");
    }
 
    if (infile)
