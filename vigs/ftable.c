@@ -11,11 +11,13 @@
 #define ALPHABET_SIZE 26
 #define OFFSET 'A'
 
+#if STANDALONE
 void usage() {
    printf("Usage: ftable [ -v ] [ -s num ] [ -p num ] [ infile [ outfile ]");
 }
+#endif
 
-int main(int argc, char **argv) {
+int ftable(char **argv) {
 
    int i, j, count = 0, charcount = 0, verbose = 0;
    unsigned int skip = 0, period = 1;
@@ -34,8 +36,10 @@ int main(int argc, char **argv) {
             sscanf((*++argv), "%u", &skip);
          }
          else {
+#if STANDALONE
             fprintf(stderr, "-s requires an argument\n");
             usage();
+#endif
             return 1;
          }
       }
@@ -44,8 +48,10 @@ int main(int argc, char **argv) {
             sscanf((*++argv), "%u", &period);
          }
          else {
+#if STANDALONE
             fprintf(stderr, "-p requires an argument\n");
             usage();
+#endif
             return 1;
          }
       }
@@ -56,7 +62,9 @@ int main(int argc, char **argv) {
          outfile = *argv;
       }
       else {
+#if STANDALONE
          usage();
+#endif
          return 1;
       }
    }
@@ -74,8 +82,10 @@ int main(int argc, char **argv) {
    if (infile) {
       infd = open(infile, O_RDONLY);
       if (infd == -1) {
+#if STANDALONE
          fprintf(stderr, "Error reading from file %s\n", infile);
          usage();
+#endif
          return 1;
       }
       dup2(infd, 0);
@@ -84,8 +94,10 @@ int main(int argc, char **argv) {
    if (outfile) {
       outfd = open(outfile, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
       if (outfd == -1) {
+#if STANDALONE
          fprintf(stderr, "Error writing to file %s\n", outfile);
          usage();
+#endif
          return 1;
       }
       dup2(outfd, 1);
@@ -121,3 +133,9 @@ int main(int argc, char **argv) {
    free(ftable);
    return 0;
 }
+
+#if STANDALONE
+int main(int argc, char **argv) {
+   return ftable(argv);
+}
+#endif

@@ -8,16 +8,18 @@
 #define OFFSET 'A'
 #define ALPHABET_SIZE 26
 
+#if STANDALONE
 void usage() {
    printf("Usage: vigs [ -v ] [ -d ] key [ infile [ outfile ] ]");
 }
+#endif
 
 int mod(int a, int b) {
    int r = a % b;
    return r < 0 ? r + b : r;
 }
 
-int main(int argc, char **argv) {
+int vigs(char **argv) {
 
    int verbose = 0, decrypt = 0;
    int infd = 0, outfd = 0;
@@ -42,21 +44,27 @@ int main(int argc, char **argv) {
          outfile = *argv;
       }
       else {
+#if STANDALONE
          usage();
+#endif
          return 1;
       }
    }
 
    if (!key) {
+#if STANDALONE
       fprintf(stderr, "No key specified\n");
       usage();
+#endif
       return 1;
    }
 
    while (key[keylen]) {
       if (!isalpha(key[keylen])) {
+#if STANDALONE
          fprintf(stderr, "Key must be alphabetic\n");
          usage();
+#endif
          return 1;
       }
       key[keylen] = toupper(key[keylen]);
@@ -76,8 +84,10 @@ int main(int argc, char **argv) {
    if (infile) {
       infd = open(infile, O_RDONLY);
       if (infd == -1) {
+#if STANDALONE
          fprintf(stderr, "Error reading from file %s\n", infile);
          usage();
+#endif
          return 1;
       }
       dup2(infd, 0);
@@ -86,8 +96,10 @@ int main(int argc, char **argv) {
    if (outfile) {
       outfd = open(outfile, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
       if (outfd == -1) {
+#if STANDALONE
          fprintf(stderr, "Error writing to file %s\n", outfile);
          usage();
+#endif
          return 1;
       }
       dup2(outfd, 1);
@@ -115,3 +127,9 @@ int main(int argc, char **argv) {
 
    return 0;
 }
+
+#if STANDALONE
+int main(int argc, char **argv) {
+   return vigs(argv);
+}
+#endif
