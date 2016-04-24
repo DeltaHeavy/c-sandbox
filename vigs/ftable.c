@@ -118,5 +118,6 @@ int main(int argc, char **argv) {
    if (outfile)
       close(outfd);
 
+   free(ftable);
    return 0;
 }
