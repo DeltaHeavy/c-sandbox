@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo -n "Test 1: Encrypt..."
+echo -n "Test 1: vigs encrypt..."
 ./vigs ham tests/1.in tests/1.testout
 diff tests/1.testout tests/1.out >/dev/null 2>&1
 ret=$?
