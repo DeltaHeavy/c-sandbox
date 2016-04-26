@@ -2,8 +2,8 @@
 
 if [ -f tests/big.in ]; then
     size=$(du -hs tests/big.in | awk '{ print $1 }')
-    echo -n "Test 8: vigs $size......."
-    /usr/bin/time -f " (time elapsed: %es)" ./vigs random tests/big.in >/dev/null 2>big.out
+    echo -n "Test 9: ftable $size....."
+    /usr/bin/time -f " (time elapsed: %es)" ./ftable tests/big.in >/dev/null 2>big.out
     ret=$?
     if [ $ret -ne 0 ]
     then 
@@ -16,5 +16,5 @@ if [ -f tests/big.in ]; then
     cat big.out
     rm big.out
 else
-    echo "Skipping test 8: no tests/big.in"
+    echo "Skipping test 9: no tests/big.in"
 fi
