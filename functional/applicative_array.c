@@ -1,32 +1,93 @@
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
-void applicative_array_int(int *arr, int n, int f(int)) {
-   int i;
-   for (i = 0; i < n; i++) {
-      arr[i] = f(arr[i]);
-   }
-}
+#define SIZE 8
+
+typedef long double long_double;
+typedef long long long_long;
+
+#define TYPE char
+#include "applicative_array.h"
+#undef TYPE
+
+#define TYPE short
+#include "applicative_array.h"
+#undef TYPE
+
+#define TYPE int
+#include "applicative_array.h"
+#undef TYPE
+
+#define TYPE float
+#include "applicative_array.h"
+#undef TYPE
+
+#define TYPE double
+#include "applicative_array.h"
+#undef TYPE
+
+#define TYPE long
+#include "applicative_array.h"
+#undef TYPE
+
+#define TYPE long_double
+#include "applicative_array.h"
+#undef TYPE
+
+#define TYPE long_long
+#include "applicative_array.h"
+#undef TYPE
+
+#define TYPE size_t
+#include "applicative_array.h"
+#undef TYPE
+
+#define TYPE ptrdiff_t
+#include "applicative_array.h"
+#undef TYPE
 
 int dbl(int a) {
-   return a * 2;
+   return 2*a;
+}
+
+double e(double r) {
+   return exp(r);
 }
 
 int main() {
-   int i;
-   int *test;
-
-   test = calloc(8, sizeof(int));
-   for (i = 0; i < 8; i++)
+   int i, *test;
+   double *foo;
+   test = calloc(SIZE, sizeof(int));
+   for (i = 0; i < SIZE; i++) {
       test[i] = i+1;
-
-   for (i = 0; i < 8; i++)
-      printf("%d\n", test[i]);
-
-   applicative_array_int(test, 8, dbl);
+      printf("%4d ", test[i]);
+   }
    printf("\n");
 
-   for (i = 0; i < 8; i++)
-      printf("%d\n", test[i]);
+   applicative_array_int(test, SIZE, dbl);
+   
+   for (i = 0; i < SIZE; i++) {
+      printf("%4d ", test[i]);
+   }
+   printf("\n");
+   free(test);
+   
+   printf("\n");
+   foo = calloc(SIZE, sizeof(double));
+   for (i = 0; i < SIZE; i++) {
+      foo[i] = i;
+      printf("%10.4f ", foo[i]);
+   }
+   printf("\n");
+
+   applicative_array_double(foo, SIZE, e);
+   
+   for (i = 0; i < SIZE; i++) {
+      printf("%10.4f ", foo[i]);
+   }
+   printf("\n");
+   free(foo);
    return 0;
 }
