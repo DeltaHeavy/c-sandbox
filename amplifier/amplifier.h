@@ -36,6 +36,6 @@
 #ifndef __AMP_H
 #define __AMP_H
 
-void ProcHarness(void *func, size_t retSize, unsigned int timeout, int argc, char** argv, unsigned int numProcs, void *sink);
+void ProcHarness(void (*func), size_t retSize, unsigned int timeout, int argc, char** argv, unsigned int numProcs, void (*sink));
 
 #endif

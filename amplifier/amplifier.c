@@ -70,6 +70,11 @@ void email(unsigned int id, int argc, char **argv, int fd) {
    execlp("echo", "echo", "exec mailx", NULL);
 }
 
+void failout(unsigned int id, int argc, char **argv, int fd) {
+   exit(1);
+}
+
+
 /* Returns int just as an example that it can */
 int print(char **buf, size_t retSize, unsigned int numProcs) {
    int i;
@@ -92,7 +97,7 @@ void sum(char **buf, size_t retSize, unsigned int numProcs) {
 }
 #endif
 
-void ProcHarness(void *func, size_t retSize, unsigned int timeout, int argc, char **argv, unsigned int numProcs, void *sink) {
+void ProcHarness(void (*func), size_t retSize, unsigned int timeout, int argc, char **argv, unsigned int numProcs, void (*sink)) {
    unsigned int i;
    char *buf;
    int *retTable = NULL; 
@@ -139,7 +144,7 @@ void ProcHarness(void *func, size_t retSize, unsigned int timeout, int argc, cha
 
    for (i = 0; i < numProcs; i++)
       if (WIFEXITED(retTable[i]) && WEXITSTATUS(retTable[i]) != 0)
-         printf("Process %d failed\n", pidTable[i]);
+         printf("Process id %d failed with status %d\n", i, WEXITSTATUS(retTable[i]));
 
    if (sink)
       ((void (*)(char**,size_t,unsigned int))sink)(&buf, retSize, numProcs);
@@ -147,12 +152,15 @@ void ProcHarness(void *func, size_t retSize, unsigned int timeout, int argc, cha
 
 #ifdef DEV
 int main(int argc, char **argv) {
+   /* func, retSize, timeout, argc, argv, numProcs, sink */
    printf("Example 1, all return id, sink = print:\n");
    ProcHarness(test, sizeof(int), 10, argc, argv, 8, print);
    printf("\nExample 2, all return id, sink = sum:\n");
    ProcHarness(test, sizeof(int), 10, argc, argv, 8, sum);
    printf("\nExample 3, none return (all procs exec), sink = NULL:\n");
    ProcHarness(email, 0, 10, 0, NULL, 8, NULL);
+   printf("\nExample 4, none return (all procs fail), sink = NULL:\n");
+   ProcHarness(failout, 0, 1, 0, NULL, 8, NULL);
 
    return 0;
 }
