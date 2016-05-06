@@ -60,6 +60,7 @@ int main() {
    int i, *test;
    double *foo;
    test = calloc(SIZE, sizeof(int));
+   fprintf(stderr, "Array of ints 1 to 8, function dbl\n");
    for (i = 0; i < SIZE; i++) {
       test[i] = i+1;
       printf("%4d ", test[i]);
@@ -75,6 +76,7 @@ int main() {
    free(test);
    
    printf("\n");
+   fprintf(stderr, "Array of doubles 0.00 to 7.00, function exp\n");
    foo = calloc(SIZE, sizeof(double));
    for (i = 0; i < SIZE; i++) {
       foo[i] = i;
