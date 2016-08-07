@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define SIZE 8
-
 typedef long double long_double;
 typedef long long long_long;
 
@@ -55,6 +53,8 @@ int dbl(int a) {
 double e(double r) {
    return exp(r);
 }
+
+#define SIZE 8
 
 int main() {
    int i, *test;
