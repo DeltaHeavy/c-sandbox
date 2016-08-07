@@ -36,6 +36,10 @@
 #ifdef DEV
 void test(unsigned int id, int argc, char **argv, int fd) {
    int buf = id;
+   while (--argc) {
+      printf("%s ", argv[argc]);
+   }
+   printf("\n");
 
    switch (id) {
       case 0:
@@ -67,29 +71,38 @@ void test(unsigned int id, int argc, char **argv, int fd) {
 }
 
 void email(unsigned int id, int argc, char **argv, int fd) {
+   printf("ID: %d\nFD: %d\n", id, fd);
+   while (--argc) {
+      printf("%s ", argv[argc]);
+   }
+   printf("\n");
    execlp("echo", "echo", "exec mailx", NULL);
 }
 
 void failout(unsigned int id, int argc, char **argv, int fd) {
+   printf("ID: %d\nFD: %d\n", id, fd);
+   while (--argc) {
+      printf("%s ", argv[argc]);
+   }
+   printf("\n");
    exit(1);
 }
 
 
-/* Returns int just as an example that it can */
-int print(char **buf, size_t retSize, unsigned int numProcs) {
-   int i;
+void print(char **buf, size_t retSize, unsigned int numProcs) {
+   unsigned int i;
    for (i = 0; i < numProcs; i++)
       printf("%d\n", (*buf)[i*retSize]);
    
    free(*buf);
    *buf = NULL;
-   return 0;
 }
 
 void sum(char **buf, size_t retSize, unsigned int numProcs) {
-   int i, j = 0;
-   for (i = 0; i < numProcs; i++)
+   unsigned int i, j = 0;
+   for (i = 0; i < numProcs; i++) {
       j += (int) (*buf)[i*retSize];
+   }
    
    printf("Total: %d\n", j);
    free(*buf);
@@ -97,7 +110,7 @@ void sum(char **buf, size_t retSize, unsigned int numProcs) {
 }
 #endif
 
-void ProcHarness(void (*func), size_t retSize, unsigned int timeout, int argc, char **argv, unsigned int numProcs, void (*sink)) {
+void ProcHarness(void (*func)(unsigned int, int,  char **, int), size_t retSize, unsigned int timeout, int argc, char **argv, unsigned int numProcs, void (*sink)(char**, size_t, unsigned int)) {
    unsigned int i;
    char *buf;
    int *retTable = NULL; 
