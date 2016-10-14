@@ -9,6 +9,8 @@
 #include <err.h>
 #include <sysexits.h>
 
+// https://cmcenroe.me/2016/10/13/babys-first-jit.html
+
 typedef int32_t (*fptr)(int32_t);
 
 int main(int argc, char **argv) {
