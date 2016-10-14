@@ -1,5 +1,6 @@
 CC=gcc
-CCOPTS=-Wall -Wpedantic -Wshadow -fno-strict-aliasing -march=native -flto -std=c11
+RM=rm
+CCOPTS=-Wall -Wpedantic -Wshadow -fno-strict-aliasing -march=native -flto -std=c11 # -Werror
 DEVOPS=-g -O0
 PRODOPTS=-Os -O2
 
@@ -12,10 +13,10 @@ default: all
 all: $(TARG)
 
 minijit: minijit.c
-	gcc $(CCOPTS) $(DEVOPS) -o $(TARG) $(TARG).c
+	$(CC) $(CCOPTS) $(DEVOPS) -o $(TARG) $(TARG).c
 
 release: minijit.c
-	gcc $(CCOPTS) $(PRODOPTS) -o $(TARG) $(TARG).c
+	$(CC) $(CCOPTS) $(PRODOPTS) -o $(TARG) $(TARG).c
 
 clean:
-	rm $(TARG)
+	$(RM) $(TARG)
