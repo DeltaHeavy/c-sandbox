@@ -10,6 +10,6 @@ prod:
 test:
 	@./test_map
 show:
-	gcc -E applicative_array.c
+	$(CC) -E applicative_array.c
 clean:
 	rm test_map

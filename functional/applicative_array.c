@@ -54,13 +54,14 @@ double e(double r) {
    return exp(r);
 }
 
-#define SIZE 8
+#define SIZE 1024*1024
 
 int main() {
-   int i, *test;
+   int i;
+   int *test;
    double *foo;
    test = calloc(SIZE, sizeof(int));
-   fprintf(stderr, "Array of ints 1 to 8, function dbl\n");
+   fprintf(stderr, "Array of ints 1 to %d, function dbl\n", SIZE);
    for (i = 0; i < SIZE; i++) {
       test[i] = i+1;
       printf("%4d ", test[i]);
@@ -74,9 +75,8 @@ int main() {
    }
    printf("\n");
    free(test);
-   
    printf("\n");
-   fprintf(stderr, "Array of doubles 0.00 to 7.00, function exp\n");
+   fprintf(stderr, "Array of doubles 0.00 to %lf, function exp\n", (double)SIZE-1);
    foo = calloc(SIZE, sizeof(double));
    for (i = 0; i < SIZE; i++) {
       foo[i] = i;
